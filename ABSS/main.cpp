@@ -19,7 +19,7 @@ int main() {
 	*/
 	
 	//RSADecryptString(const char *privFilename, const char *ciphertext)//Ω‚√‹
-	char* privfilename = "D:\\Documentation\\priv.txt";
+	/*char* privfilename = "D:\\Documentation\\priv.txt";
 	char* pubfilename = "D:\\Documentation\\pub.txt";
 	GenerateRSAKey(2048, privfilename, pubfilename, seed);
 
@@ -27,7 +27,30 @@ int main() {
 	cout << Enc << endl;
 
 	string Dec = RSADecryptString(privfilename, Enc.c_str());
-	cout << Dec << endl;
+	cout << Dec << endl;*/
+
+	char* prifile = "ec.pri.key";
+	char* pubfile = "ec.pub.key";
+	ECCkeyger(prifile, pubfile);
+
+	SecretShareFile(3, 5, pubfile, seed);
+	char* outfilename = "ec.test.key";
+	char* infilenames[] = { "ec.pub.key.000",
+		"ec.pub.key.003",
+		"ec.pub.key.004" };
+	SecretRecoverFile(3, outfilename, infilenames);
+
+	ECDSA<ECP, SHA1>::PrivateKey privateKey;
+	ECDSA<ECP, SHA1>::PublicKey publicKey;
+	LoadPrivateKey( "ec.pri.key", privateKey );
+	LoadPublicKey( "ec.test.key", publicKey );
+
+	string message = "hello world!";
+	string signature;
+	ECCSign(privateKey, message, signature);
+	if (ECCCheck(publicKey, message, signature))
+		cout << "pass";
+	else cout << "error";
 
 	return 0;
 }

@@ -7,9 +7,33 @@
 #include "files.h"
 #include "modes.h"
 #include "default.h"
+#include "osrng.h"
+using CryptoPP::AutoSeededRandomPool;
+
+#include "eccrypto.h"
+using CryptoPP::ECP;
+using CryptoPP::ECDSA;
+
+#include "sha.h"
+using CryptoPP::SHA1;
+
+#include "queue.h"
+using CryptoPP::ByteQueue;
+
+#include "oids.h"
+using CryptoPP::OID;
+
+#include "asn.h"
+using namespace CryptoPP::ASN1;
+
+#include "integer.h"
+using CryptoPP::Integer;
 //#include "validate.h"
 #include<string>
 using std::string;
+using std::cout;
+using std::cerr;
+using std::endl;
 using namespace CryptoPP;
 
 namespace { OFB_Mode<AES>::Encryption s_globalRNG; }
@@ -60,6 +84,54 @@ string RSADecryptString(const char *privFilename, const char *ciphertext)//Ω‚√‹
 
 	string result;
 	StringSource(ciphertext, true, new HexDecoder(new PK_DecryptorFilter(GlobalRNG(), priv, new StringSink(result))));
+	return result;
+}
+
+void LoadPrivateKey(const string& filename, ECDSA<ECP, SHA1>::PrivateKey& key)
+{
+	key.Load(FileSource(filename.c_str(), true /*pump all*/).Ref());
+}
+
+void LoadPublicKey(const string& filename, ECDSA<ECP, SHA1>::PublicKey& key)
+{
+	key.Load(FileSource(filename.c_str(), true /*pump all*/).Ref());
+}
+
+void ECCkeyger(const string& prifile, const string& pubfile) {
+	AutoSeededRandomPool prng;
+
+	ECDSA<ECP, SHA1>::PrivateKey privKey;
+	privKey.Initialize(prng, secp160r1());
+	privKey.Save(FileSink(prifile.c_str(), true /*binary*/).Ref());
+
+	ECDSA<ECP, SHA1>::PublicKey pubKey;
+	privKey.MakePublicKey(pubKey);
+	pubKey.Save(FileSink(pubfile.c_str(), true /*binary*/).Ref());
+}
+
+void ECCSign(const ECDSA<ECP, SHA1>::PrivateKey& key, const string& message, string& signature) {
+	AutoSeededRandomPool prng;
+
+	signature.erase();
+
+	StringSource(message, true,
+		new SignerFilter(prng,
+			ECDSA<ECP, SHA1>::Signer(key),
+			new StringSink(signature)
+		) // SignerFilter
+	); // StringSource
+}
+
+bool ECCCheck(const ECDSA<ECP, SHA1>::PublicKey& key, const string& message, const string& signature) {
+	bool result = false;
+
+	StringSource(signature + message, true,
+		new SignatureVerificationFilter(
+			ECDSA<ECP, SHA1>::Verifier(key),
+			new ArraySink((byte*)&result, sizeof(result))
+		) // SignatureVerificationFilter
+	);
+
 	return result;
 }
 

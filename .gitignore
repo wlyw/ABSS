@@ -4,6 +4,12 @@
 *.sln
 *.vcxproj
 *.filters
+*.key
+*.000
+*.001
+*.002
+*.003
+*.004
 
 # User-specific files
 *.suo
