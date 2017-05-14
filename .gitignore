@@ -5,11 +5,6 @@
 *.vcxproj
 *.filters
 *.key
-*.000
-*.001
-*.002
-*.003
-*.004
 *.key.*
 
 # User-specific files
