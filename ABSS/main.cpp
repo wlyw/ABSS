@@ -48,7 +48,7 @@ int main() {
 
 	char* prifile = "ec.pri.key";
 	char* pubfile = "ec.pub.key";
-	//ECCkeyger(prifile, pubfile);
+	ECCkeyger(prifile, pubfile);
 
 	DWORD start_time = GetTickCount();
 	SecretShareFile(5, 20, pubfile, seed);

@@ -10,6 +10,7 @@
 *.002
 *.003
 *.004
+*.key.*
 
 # User-specific files
 *.suo
