@@ -1,9 +1,26 @@
 #include<iostream>
+#include<Windows.h>
+#include<bitset>
 #include "SS.h"
 #include "Aut.h"
 using namespace std;
 
 #pragma comment(lib, "cryptopp\\lib\\cryptlib.lib")
+
+string stringTobinary(string str) {
+	string res;
+	for (auto each : str) {
+		string tmp;
+		for (int i = 0; i < 8; ++i) {
+			if (each & 1) tmp.push_back('1');
+			else tmp.push_back('0');
+			each >>= 1;
+		}
+		reverse(tmp.begin(), tmp.end());
+		res += tmp;
+	}
+	return res;
+}
 
 int main() {
 	//char* filename = "D:\\Documentation\\in.txt";
@@ -31,14 +48,19 @@ int main() {
 
 	char* prifile = "ec.pri.key";
 	char* pubfile = "ec.pub.key";
-	ECCkeyger(prifile, pubfile);
+	//ECCkeyger(prifile, pubfile);
 
-	SecretShareFile(3, 5, pubfile, seed);
+	DWORD start_time = GetTickCount();
+	SecretShareFile(5, 20, pubfile, seed);
 	char* outfilename = "ec.test.key";
 	char* infilenames[] = { "ec.pub.key.000",
+		"ec.pub.key.001",
+		"ec.pub.key.002",
 		"ec.pub.key.003",
 		"ec.pub.key.004" };
-	SecretRecoverFile(3, outfilename, infilenames);
+	SecretRecoverFile(5, outfilename, infilenames);
+	DWORD end_time = GetTickCount();
+	cout << end_time - start_time << "ms" << endl;
 
 	ECDSA<ECP, SHA1>::PrivateKey privateKey;
 	ECDSA<ECP, SHA1>::PublicKey publicKey;
@@ -48,6 +70,11 @@ int main() {
 	string message = "hello world!";
 	string signature;
 	ECCSign(privateKey, message, signature);
+	cout << "消息:" << endl;
+	cout << message << endl;
+	cout << "签名(二进制):" << endl;
+	cout << stringTobinary(signature) << endl;
+
 	if (ECCCheck(publicKey, message, signature))
 		cout << "pass";
 	else cout << "error";
