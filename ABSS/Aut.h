@@ -101,7 +101,7 @@ void ECCkeyger(const string& prifile, const string& pubfile) {
 	AutoSeededRandomPool prng;
 
 	ECDSA<ECP, SHA1>::PrivateKey privKey;
-	privKey.Initialize(prng, secp160r1());
+	privKey.Initialize(prng, secp224r1());
 	privKey.Save(FileSink(prifile.c_str(), true /*binary*/).Ref());
 
 	ECDSA<ECP, SHA1>::PublicKey pubKey;

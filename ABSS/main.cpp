@@ -24,7 +24,7 @@ string stringTobinary(string str) {
 
 int main() {
 	//char* filename = "D:\\Documentation\\in.txt";
-	char* seed = "201759";
+	char* seed = "2017514";
 	//SecretShareFile(3, 5, filename, seed);
 
 	/*
@@ -51,17 +51,13 @@ int main() {
 	ECCkeyger(prifile, pubfile);
 
 	DWORD start_time = GetTickCount();
-	SecretShareFile(5, 20, pubfile, seed);
+	SecretShareFile(3, 5, pubfile, seed);
 	char* outfilename = "ec.test.key";
 	char* infilenames[] = { "ec.pub.key.000",
 		"ec.pub.key.001",
-		"ec.pub.key.002",
-		"ec.pub.key.003",
-		"ec.pub.key.004" };
-	SecretRecoverFile(5, outfilename, infilenames);
-	DWORD end_time = GetTickCount();
-	cout << end_time - start_time << "ms" << endl;
-
+		"ec.pub.key.002"};
+	SecretRecoverFile(3, outfilename, infilenames);
+	
 	ECDSA<ECP, SHA1>::PrivateKey privateKey;
 	ECDSA<ECP, SHA1>::PublicKey publicKey;
 	LoadPrivateKey( "ec.pri.key", privateKey );
@@ -69,6 +65,8 @@ int main() {
 
 	string message = "hello world!";
 	string signature;
+
+	DWORD mid_time = GetTickCount();
 	ECCSign(privateKey, message, signature);
 	cout << "ÏûÏ¢:" << endl;
 	cout << message << endl;
@@ -78,6 +76,10 @@ int main() {
 	if (ECCCheck(publicKey, message, signature))
 		cout << "pass";
 	else cout << "error";
+	DWORD end_time = GetTickCount();
+	cout << endl << mid_time - start_time << endl;
+	cout << endl << end_time - start_time << endl;
 
+	getchar();
 	return 0;
 }
